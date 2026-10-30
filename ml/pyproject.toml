@@ -1,0 +1,8 @@
+[project]
+name = "humanizer-ml"
+version = "0.1.0"
+description = "Fine-tuning for the humanizer. Only needed on the training Mac (M2)."
+requires-python = ">=3.12"
+dependencies = [
+    "mlx-lm[train]",
+]

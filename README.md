@@ -1,36 +1,26 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Humanize Writing
 
-## Getting Started
+An AI writing editor: turns stiff AI-assistant drafts into natural writing, with a sentence-level writing check. Built with Next.js 16 and the AI SDK.
 
-First, run the development server:
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+nvm use            # Node 24
+cp .env.example .env.local   # add ANTHROPIC_API_KEY (or a gateway / Google key)
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## How it works
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Humanizer** (`src/lib/humanizer.ts`). Splits text into chunks of about 250 words and generates 2–3 rewrites per chunk in parallel at the selected level. Each rewrite is scored with the V1 detector and the most human-scoring one is kept. Clicking a sentence fetches 4 alternatives for it.
+- **Detector V1** (`src/lib/detector/stats.ts`). Stylometric and free: AI buzzwords and phrases, sentence-length burstiness, contraction rate, lexical diversity.
+- **Detector V2** (`src/lib/detector/index.ts`). An LLM judge scores each sentence, blended 75/25 with V1. Set `DETECTOR_URL` to swap in a self-hosted classifier.
+- **Quotas** (`src/lib/quota.ts`). In-memory, per IP, per day. Replace with Redis or per-user counters when accounts land.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Roadmap
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Auth, Postgres, and per-plan quotas and word limits.
+2. Billing (subscriptions with monthly/yearly plans).
+3. Fine-tuned rewriter (see `ml/README.md`), served via mlx_lm.server or vLLM (`FINETUNED_BASE_URL`).
+4. Our own trained detector (`DETECTOR_URL`).

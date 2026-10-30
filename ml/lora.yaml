@@ -1,0 +1,26 @@
+# QLoRA fine-tune of the humanizer for a 16 GB Apple Silicon Mac.
+# Run from ml/:  uv run mlx_lm.lora -c lora.yaml
+model: mlx-community/Qwen3-4B-Instruct-2507-4bit
+train: true
+data: data/sft
+adapter_path: adapters/humanizer
+
+fine_tune_type: lora
+num_layers: 16
+# Only learn from the human rewrite, not from the AI input.
+mask_prompt: true
+
+# Small batches plus checkpointing keep peak memory well under 16 GB.
+batch_size: 2
+grad_accumulation_steps: 2
+grad_checkpoint: true
+max_seq_length: 1024
+
+# ~1 epoch over ~4,500 examples at an effective batch of 4.
+iters: 1100
+learning_rate: 1e-4
+steps_per_report: 20
+steps_per_eval: 200
+val_batches: 25
+save_every: 200
+seed: 0
